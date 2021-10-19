@@ -1,24 +1,36 @@
 {% extends 'base.html' %}
+{% load pybo_filter %}
 {% block content %}
 <div class = "container my-3">
   <table class="table">
     <thead>
-    <tr class="thead-dark">
+    <tr class="text-center thead-dark">
       <th>번호</th>
-      <th>제목</th>
+      <th style="width:50%">제목</th>
+      <th>글쓴이</th>
       <th>작성일시</th>
     </tr>
     </thead>
     <tbody>
     {% if question_list %}
+    <!-- 사용자정의 태그를 사용한 계산 -->
+    {% list_count question_list.paginator.count question_list.number question_list.paginator.per_page as startnumber%}
     {% for question in question_list %}
-    <tr>
-      <td>{{ forloop.counter }}</td>
-      <td>
+    <tr class="text-center">
+      <!-- 사용자정의 태그를 사용한 경우 -->
+      <td>{{ startnumber|sub:forloop.counter0|add:1}}</td>
+      <!-- 사용자정의 필터를 사용한 경우 -->
+      <!-- <td>{{ question_list.paginator.count|sub:question_list.start_index|sub:forloop.counter0|add:1 }}</td> -->
+      <td class="text-left">
         <a href="{% url 'pybo:detail' question.id %}">
           {{ question.subject }}
+          {% if question.answer_set.count > 0 %}
+          <span class="text-danger small ml-2">{{ question.answer_set.count }}</span>
+          {% endif %}
         </a>
       </td>
+      <!-- 글쓴이추가 -->
+      <td>{{ question.author.username }}</td> 
       <td>{{ question.create_date }}</td>
     </tr>
     {% endfor %}
